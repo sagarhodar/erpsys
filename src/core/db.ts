@@ -54,3 +54,7 @@ export async function getNextDocNo(prefix: string, client?: pg.PoolClient): Prom
   );
   return `${prefix}${year}${String(result.rows[0].last_no).padStart(5, '0')}`;
 }
+
+ssl: {
+  rejectUnauthorized: false
+}
