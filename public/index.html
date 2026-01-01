@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 14px Arial, sans-serif; background: #f5f5f5; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    
+    /* Header */
+    header { background: #2c3e50; color: white; padding: 15px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    header h1 { font-size: 22px; display: inline-block; }
+    .user-info { float: right; padding: 8px 0; }
+    
+    /* Navigation */
+    nav { background: white; padding: 0; margin: 20px 0; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    nav button { border: none; background: none; padding: 15px 25px; cursor: pointer; font-size: 14px; border-right: 1px solid #eee; transition: all 0.2s; }
+    nav button:hover { background: #f8f9fa; }
+    nav button.active { background: #3498db; color: white; }
+    
+    /* Content */
+    .content { background: white; padding: 25px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section { display: none; }
+    .section.active { display: block; }
+    
+    /* Forms */
+    .form-row { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    textarea { resize: vertical; min-height: 80px; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+    
+    /* Buttons */
+    button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-success:hover { background: #229954; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+    
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; color: #333; position: sticky; top: 0; }
+    tr:hover { background: #f8f9fa; }
+    .table-container { max-height: 500px; overflow-y: auto; margin-top: 20px; }
+    
+    /* Item Lines */
+    .items-section { margin-top: 25px; padding: 20px; background: #f8f9fa; border-radius: 4px; }
+    .items-section h3 { margin-bottom: 15px; color: #333; }
+    .item-row { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 10px; padding: 10px; background: white; border-radius: 4px; }
+    .item-row input, .item-row select { margin: 0; }
+    .btn-remove { background: #e74c3c; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-add { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    
+    /* Totals */
+    .totals { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+    .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
+    .total-row.grand { font-weight: bold; font-size: 18px; border-top: 2px solid #333; padding-top: 12px; margin-top: 8px; }
+    
+    /* Cards */
+    .card { background: white; padding: 20px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card h3 { margin-bottom: 15px; color: #2c3e50; }
+    
+    /* Status badges */
+    .badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-draft { background: #f39c12; color: white; }
+    .badge-submitted { background: #27ae60; color: white; }
+    .badge-cancelled { background: #e74c3c; color: white; }
+    
+    /* List view */
+    .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .list-header h2 { color: #2c3e50; }
+    
+    /* Messages */
+    .message { padding: 12px 20px; border-radius: 4px; margin-bottom: 15px; }
+    .message-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .message-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    
+    /* Loading */
+    .loading { text-align: center; padding: 40px; color: #95a5a6; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📊 ERP System</h1>
+    <div class="user-info">Welcome, Admin</div>
+  </header>
+
+  <div class="container">
+    <nav>
+      <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+      <button class="nav-btn" data-section="master">Masters</button>
+      <button class="nav-btn" data-section="purchase">Purchase</button>
+      <button class="nav-btn" data-section="sales">Sales</button>
+      <button class="nav-btn" data-section="inventory">Inventory</button>
+      <button class="nav-btn" data-section="reports">Reports</button>
+    </nav>
+
+    <div class="content">
+      <!-- Dashboard -->
+      <div class="section active" id="dashboard">
+        <h2>Dashboard</h2>
+        <div id="dashboardContent" style="margin-top: 20px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div class="card">
+              <h3>Today's Summary</h3>
+              <div class="total-row"><span>Sales Orders:</span><span id="dash-so">-</span></div>
+              <div class="total-row"><span>Purchase Orders:</span><span id="dash-po">-</span></div>
+              <div class="total-row"><span>Deliveries:</span><span id="dash-dc">-</span></div>
+            </div>
+            <div class="card">
+              <h3>Quick Actions</h3>
+              <button class="btn-primary" onclick="app.showForm('salesOrder')" style="width:100%; margin-bottom:10px">New Sales Order</button>
+              <button class="btn-primary" onclick="app.showForm('purchaseOrder')" style="width:100%; margin-bottom:10px">New Purchase Order</button>
+              <button class="btn-primary" onclick="app.showForm('deliveryNote')" style="width:100%">New Delivery</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Masters Section -->
+      <div class="section" id="master">
+        <h2>Master Data Management</h2>
+        <div style="margin-top: 20px;">
+          <button class="btn-primary" onclick="app.showForm('party')" style="margin-right: 10px">Add Party</button>
+          <button class="btn-primary" onclick="app.showForm('item')">Add Item</button>
+        </div>
+        
+        <div class="card" style="margin-top: 20px;">
+          <h3>Parties</h3>
+          <div class="table-container">
+            <table id="partiesTable">
+              <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>GSTIN</th><th>Balance</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Items</h3>
+          <div class="table-container">
+            <table id="itemsTable">
+              <thead><tr><th>Code</th><th>Name</th><th>Unit</th><th>Rate</th><th>GST %</th><th>Stock</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Purchase Section -->
+      <div class="section" id="purchase">
+        <div class="list-header">
+          <h2>Purchase Management</h2>
+          <div>
+            <button class="btn-primary" onclick="app.showForm('purchaseOrder')">New Purchase Order</button>
+            <button class="btn-success" onclick="app.showForm('grn')" style="margin-left: 10px">New GRN</button>
+            <button class="btn-success" onclick="app.showForm('purchaseInvoice')" style="margin-left: 10px">New Purchase Invoice</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Purchase Orders</h3>
+          <div class="table-container">
+            <table id="poTable">
+              <thead><tr><th>Doc No</th><th>Date</th><th>Supplier</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>GRNs</h3>
+          <div class="table-container">
+            <table id="grnTable">
+              <thead><tr><th>Doc No</th><th>Date</th><th>PO No</th><th>Supplier</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Purchase Invoices</h3>
+          <div class="table-container">
+            <table id="pinvTable">
+              <thead><tr><th>Doc No</th><th>Date</th><th>Supplier</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sales Section -->
+      <div class="section" id="sales">
+        <div class="list-header">
+          <h2>Sales Management</h2>
+          <div>
+            <button class="btn-primary" onclick="app.showForm('salesQuotation')">New Quotation</button>
+            <button class="btn-primary" onclick="app.showForm('salesOrder')" style="margin-left: 10px">New Sales Order</button>
+            <button class="btn-success" onclick="app.showForm('deliveryNote')" style="margin-left: 10px">New Delivery</button>
+            <button class="btn-success" onclick="app.showForm('salesInvoice')" style="margin-left: 10px">New Sales Invoice</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Sales Orders</h3>
+          <div class="table-container">
+            <table id="soTable">
+              <thead><tr><th>Doc No</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Delivery Notes</h3>
+          <div class="table-container">
+            <table id="dcTable">
+              <thead><tr><th>Doc No</th><th>Date</th><th>SO No</th><th>Customer</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Sales Invoices</h3>
+          <div class="table-container">
+            <table id="sinvTable">
+              <thead><tr><th>Doc No</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Section -->
+      <div class="section" id="inventory">
+        <h2>Inventory Management</h2>
+        <div class="card" style="margin-top: 20px;">
+          <h3>Current Stock</h3>
+          <div class="table-container">
+            <table id="stockTable">
+              <thead><tr><th>Item Code</th><th>Item Name</th><th>Unit</th><th>Current Stock</th><th>Rate</th><th>Value</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reports Section -->
+      <div class="section" id="reports">
+        <h2>Reports</h2>
+        <div class="card" style="margin-top: 20px;">
+          <h3>Available Reports</h3>
+          <div class="form-grid">
+            <div>
+              <label>Ledger Report</label>
+              <select id="reportAccountId">
+                <option value="">Select Account</option>
+              </select>
+              <button class="btn-primary" onclick="app.showReport('ledger')" style="margin-top: 10px; width: 100%">View Ledger</button>
+            </div>
+            <div>
+              <label>Stock Report</label>
+              <select id="reportItemId">
+                <option value="">Select Item</option>
+              </select>
+              <button class="btn-primary" onclick="app.showReport('stock')" style="margin-top: 10px; width: 100%">View Stock Ledger</button>
+            </div>
+            <div>
+              <label>Party Ledger</label>
+              <select id="reportPartyId">
+                <option value="">Select Party</option>
+              </select>
+              <button class="btn-primary" onclick="app.showReport('party')" style="margin-top: 10px; width: 100%">View Party Ledger</button>
+            </div>
+          </div>
+          <div id="reportResult" class="table-container" style="margin-top: 20px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for forms -->
+  <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto;">
+    <div style="max-width: 1000px; margin: 30px auto; background: white; border-radius: 8px; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 id="modalTitle">Form</h2>
+        <button onclick="app.closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #95a5a6;">&times;</button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
