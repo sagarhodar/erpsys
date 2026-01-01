@@ -11,6 +11,11 @@ export const pool = new Pool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+
+  // ✅ REQUIRED for Render PostgreSQL
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 export async function query(text: string, params?: any[]) {
@@ -26,7 +31,9 @@ export async function query(text: string, params?: any[]) {
   }
 }
 
-export async function transaction<T>(callback: (client: pg.PoolClient) => Promise<T>): Promise<T> {
+export async function transaction<T>(
+  callback: (client: pg.PoolClient) => Promise<T>
+): Promise<T> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -41,20 +48,21 @@ export async function transaction<T>(callback: (client: pg.PoolClient) => Promis
   }
 }
 
-export async function getNextDocNo(prefix: string, client?: pg.PoolClient): Promise<string> {
+export async function getNextDocNo(
+  prefix: string,
+  client?: pg.PoolClient
+): Promise<string> {
   const q = client || pool;
   const year = new Date().getFullYear().toString().slice(-2);
+
   const result = await q.query(
-    `INSERT INTO doc_series (prefix, year, last_no) 
-     VALUES ($1, $2, 1) 
-     ON CONFLICT (prefix, year) 
-     DO UPDATE SET last_no = doc_series.last_no + 1 
+    `INSERT INTO doc_series (prefix, year, last_no)
+     VALUES ($1, $2, 1)
+     ON CONFLICT (prefix, year)
+     DO UPDATE SET last_no = doc_series.last_no + 1
      RETURNING last_no`,
     [prefix, year]
   );
-  return `${prefix}${year}${String(result.rows[0].last_no).padStart(5, '0')}`;
-}
 
-ssl: {
-  rejectUnauthorized: false
+  return `${prefix}${year}${String(result.rows[0].last_no).padStart(5, '0')}`;
 }
