@@ -4,8 +4,8 @@ import pg from 'pg';
 
 export class LedgerEngine {
   // Post financial entry
-  async postEntry(entry: LedgerEntry, client?: pg.PoolClient): Promise<void> {
-    const q = client || pool;
+  async postEntry(entry: LedgerEntry, client: pg.PoolClient): Promise<void> {
+    const q = client;
     
     await q.query(
       `INSERT INTO ledger_entries 
@@ -50,9 +50,9 @@ export class LedgerEngine {
     drAccount: number,
     crAccount: number,
     amount: number,
+    client: pg.PoolClient,
     partyId?: number,
-    remarks?: string,
-    client?: pg.PoolClient
+    remarks?: string
   ): Promise<void> {
     await this.postEntry(
       {
@@ -86,8 +86,8 @@ export class LedgerEngine {
   }
 
   // Post stock movement
-  async postStock(entry: StockLedger, client?: pg.PoolClient): Promise<void> {
-    const q = client || pool;
+  async postStock(entry: StockLedger, client: pg.PoolClient): Promise<void> {
+    const q = client;
 
     // Insert stock ledger entry
     await q.query(
@@ -115,8 +115,8 @@ export class LedgerEngine {
   }
 
   // Cancel document entries
-  async cancelEntries(docType: string, docId: number, client?: pg.PoolClient): Promise<void> {
-    const q = client || pool;
+  async cancelEntries(docType: string, docId: number, client: pg.PoolClient): Promise<void> {
+    const q = client;
 
     // Reverse ledger entries
     const ledgerResult = await q.query(
