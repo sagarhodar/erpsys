@@ -69,13 +69,13 @@ class ERPApp {
     await this.loadMasterData();
     this.renderTable('partiesTable', this.parties, [
       'code', 'name', 'type', 'gstin', 
-      { key: 'balance', format: v => '₹' + v.toFixed(2) }
+      { key: 'balance', format: v => '₹' + parseFloat(v || 0).toFixed(2) }
     ], []);
     this.renderTable('itemsTable', this.items, [
       'code', 'name', 'unit', 
-      { key: 'rate', format: v => '₹' + v.toFixed(2) },
-      { key: 'gst_rate', format: v => v + '%' },
-      { key: 'current_stock', format: v => v.toFixed(2) }
+      { key: 'rate', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
+      { key: 'gst_rate', format: v => parseFloat(v || 0) + '%' },
+      { key: 'current_stock', format: v => parseFloat(v || 0).toFixed(2) }
     ], []);
   }
 
@@ -91,7 +91,7 @@ class ERPApp {
         'doc_no',
         { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
         'supplier_name',
-        { key: 'total', format: v => '₹' + v.toFixed(2) },
+        { key: 'total', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
         { key: 'status', format: v => `<span class="badge badge-${v}">${v}</span>` }
       ], [
         { label: 'Submit', action: (item) => this.submitDocument('po', item.id), condition: (item) => item.status === 'draft' }
@@ -111,7 +111,7 @@ class ERPApp {
         'doc_no',
         { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
         'supplier_name',
-        { key: 'total', format: v => '₹' + v.toFixed(2) },
+        { key: 'total', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
         { key: 'status', format: v => `<span class="badge badge-${v}">${v}</span>` }
       ], [
         { label: 'Submit', action: (item) => this.submitDocument('purchaseInvoice', item.id), condition: (item) => item.status === 'draft' }
@@ -133,7 +133,7 @@ class ERPApp {
         'doc_no',
         { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
         'customer_name',
-        { key: 'total', format: v => '₹' + v.toFixed(2) },
+        { key: 'total', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
         { key: 'status', format: v => `<span class="badge badge-${v}">${v}</span>` }
       ], [
         { label: 'Submit', action: (item) => this.submitDocument('so', item.id), condition: (item) => item.status === 'draft' }
@@ -153,7 +153,7 @@ class ERPApp {
         'doc_no',
         { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
         'customer_name',
-        { key: 'total', format: v => '₹' + v.toFixed(2) },
+        { key: 'total', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
         { key: 'status', format: v => `<span class="badge badge-${v}">${v}</span>` }
       ], [
         { label: 'Submit', action: (item) => this.submitDocument('salesInvoice', item.id), condition: (item) => item.status === 'draft' }
@@ -167,9 +167,9 @@ class ERPApp {
     await this.loadMasterData();
     this.renderTable('stockTable', this.items, [
       'code', 'name', 'unit',
-      { key: 'current_stock', format: v => v.toFixed(2) },
-      { key: 'rate', format: v => '₹' + v.toFixed(2) },
-      { key: 'value', format: (v, item) => '₹' + (item.current_stock * item.rate).toFixed(2) }
+      { key: 'current_stock', format: v => parseFloat(v || 0).toFixed(2) },
+      { key: 'rate', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
+      { key: 'value', format: (v, item) => '₹' + (parseFloat(item.current_stock || 0) * parseFloat(item.rate || 0)).toFixed(2) }
     ], []);
   }
 
@@ -968,8 +968,8 @@ class ERPApp {
           { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
           'doc_type',
           'party_name',
-          { key: 'txn_type', format: v => v.toUpperCase() },
-          { key: 'amount', format: v => '₹' + v.toFixed(2) },
+          { key: 'txn_type', format: v => v ? v.toUpperCase() : '-' },
+          { key: 'amount', format: v => '₹' + parseFloat(v || 0).toFixed(2) },
           'remarks'
         ];
       } else if (type === 'stock') {
@@ -983,9 +983,9 @@ class ERPApp {
           'doc_no',
           { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
           'doc_type',
-          { key: 'movement', format: v => v.toUpperCase() },
-          { key: 'qty', format: v => v.toFixed(2) },
-          { key: 'rate', format: v => '₹' + v.toFixed(2) }
+          { key: 'movement', format: v => v ? v.toUpperCase() : '-' },
+          { key: 'qty', format: v => parseFloat(v || 0).toFixed(2) },
+          { key: 'rate', format: v => '₹' + parseFloat(v || 0).toFixed(2) }
         ];
       } else if (type === 'party') {
         const partyId = document.getElementById('reportPartyId').value;
@@ -999,8 +999,8 @@ class ERPApp {
           { key: 'doc_date', format: v => new Date(v).toLocaleDateString() },
           'doc_type',
           'account_name',
-          { key: 'txn_type', format: v => v.toUpperCase() },
-          { key: 'amount', format: v => '₹' + v.toFixed(2) }
+          { key: 'txn_type', format: v => v ? v.toUpperCase() : '-' },
+          { key: 'amount', format: v => '₹' + parseFloat(v || 0).toFixed(2) }
         ];
       }
 
